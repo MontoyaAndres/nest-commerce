@@ -1,9 +1,12 @@
-import { Controller, Post, Body } from "@nestjs/common";
+import { Controller, Post, Body, Get, UseGuards } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 
 import { UserService } from "../shared/user.service";
 import { LoginDTO, RegisterDTO } from "./auth.dto";
 import { Payload } from "../types/payload";
 import { AuthService } from "./auth.service";
+import { User } from "../utils/user.decorator";
+import { SellerGuard } from "../guards/seller.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -11,6 +14,13 @@ export class AuthController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
+
+  @Get()
+  @UseGuards(AuthGuard("jwt"), SellerGuard)
+  public async findAll(@User() user) {
+    console.log(user);
+    return "hey";
+  }
 
   @Post("login")
   public async login(@Body() userDTO: LoginDTO) {
