@@ -31,7 +31,6 @@ describe("Authentication method", () => {
     password: "password",
   };
 
-  let userToken: string;
   let sellerToken: string;
 
   it("should register user", () => {
@@ -79,8 +78,6 @@ describe("Authentication method", () => {
       .set("Accept", "application/json")
       .send(user)
       .expect(({ body }) => {
-        userToken = body.token;
-
         expect(body.token).toBeDefined();
         expect(body.user.username).toEqual("username");
         expect(body.user.password).toBeUndefined();
@@ -101,5 +98,13 @@ describe("Authentication method", () => {
         expect(body.user.password).toBeUndefined();
         expect(body.user.seller).toBeTruthy();
       });
+  });
+
+  it("should respect seller token", () => {
+    return request(app)
+      .get("/product/mine")
+      .set("Accept", "application/json")
+      .set("Authorization", `Bearer ${sellerToken}`)
+      .expect(200);
   });
 });
